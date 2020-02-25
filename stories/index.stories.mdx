@@ -1,0 +1,55 @@
+import { Story, Preview, Meta, Props, html } from '@open-wc/demoing-storybook';
+
+import '../dwight-job-application.js';
+
+<Meta 
+  title="DwightJobApplication"
+  parameters={{
+    component: "dwight-job-application",
+    options: { selectedPanel: "storybookjs/knobs/panel" }
+  }}
+/>
+
+# DwightJobApplication
+
+A component for...
+
+## Features:
+
+- a
+- b
+- ...
+
+## How to use
+
+### Installation
+
+```bash
+yarn add dwight-job-application
+```
+
+```js
+import 'dwight-job-application/dwight-job-application.js';
+```
+
+<Preview withToolbar>
+  <Story name="Simple">
+    {html`
+      <dwight-job-application></dwight-job-application>
+    `}
+  </Story>
+</Preview>
+
+## API
+
+<Props of="dwight-job-application" />
+
+## Variations
+
+###### Custom Title
+
+<Story name="Custom Title">
+  {html`
+    <dwight-job-application .title=${'Hello World'}></dwight-job-application>
+  `}
+</Story>
