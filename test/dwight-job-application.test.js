@@ -4,6 +4,103 @@ import { createModel } from "../src/xstate-test/es";
 
 import "../dwight-job-application.js";
 
+const questions = [
+  {
+    id: "1",
+    right: {
+      test: async ({ el, expect }) => {
+        expect(el.state.context.question1).to.equal("yes");
+      },
+      eventExec: async ({ el }) => {
+        el.shadowRoot.querySelector("chameleon-radio[value='yes']").click();
+      }
+    },
+    wrong: {
+      test: async ({ el, expect }) => {
+        expect(el.state.context.question1).to.equal("no");
+      },
+      eventExec: async ({ el }) => {
+        el.shadowRoot.querySelector("chameleon-radio[value='no']").click();
+      }
+    },
+    blank: {
+      test: async ({ el, expect }) => {
+        expect(el.state.context.question1).to.equal("");
+      },
+      eventExec: () => {}
+    }
+  },
+  {
+    id: "2",
+    right: {
+      test: async ({ el, expect }) => {
+        expect(el.state.context.question2).to.equal("Teach me, sensei");
+      },
+      eventExec: async ({ el }) => {
+        const inputTextarea = el.shadowRoot.querySelector(
+          "textarea[name='question2']"
+        );
+        inputTextarea.value = "Teach me, sensei";
+        inputTextarea.dispatchEvent(
+          new CustomEvent("change", { target: inputTextarea })
+        );
+      }
+    },
+    wrong: {
+      test: async ({ el, expect }) => {
+        expect(el.state.context.question2).to.equal(
+          "A standard working relationship"
+        );
+      },
+      eventExec: async ({ el }) => {
+        const inputTextarea = el.shadowRoot.querySelector(
+          "textarea[name='question2']"
+        );
+        inputTextarea.value = "A standard working relationship";
+        inputTextarea.dispatchEvent(
+          new CustomEvent("change", { target: inputTextarea })
+        );
+      }
+    },
+    blank: {
+      test: async ({ el, expect }) => {
+        expect(el.state.context.question2).to.equal("");
+      },
+      eventExec: () => {}
+    }
+  }
+];
+
+const buildQuestionNode = q => {
+  return {
+    initial: "unanswered",
+    states: {
+      unanswered: {
+        on: {
+          [`Q${q.id}_WRONG`]: "wrong",
+          [`Q${q.id}_RIGHT`]: "right",
+          [`Q${q.id}_BLANK`]: "blank"
+        }
+      },
+      wrong: {
+        meta: {
+          test: q.wrong.test
+        }
+      },
+      right: {
+        meta: {
+          test: q.right.test
+        }
+      },
+      blank: {
+        meta: {
+          test: q.blank.test
+        }
+      }
+    }
+  };
+};
+
 const dwightMachine = Machine({
   id: "dwight",
   initial: "intro",
@@ -35,39 +132,8 @@ const dwightMachine = Machine({
       },
       type: "parallel",
       states: {
-        q1: {
-          initial: "unanswered",
-          states: {
-            unanswered: {
-              on: {
-                Q1_WRONG: "wrong",
-                Q1_RIGHT: "right",
-                Q1_BLANK: "blank"
-              }
-            },
-            wrong: {
-              meta: {
-                test: async ({ el, expect }) => {
-                  expect(el.state.context.question1).to.equal("no");
-                }
-              }
-            },
-            right: {
-              meta: {
-                test: async ({ el, expect }) => {
-                  expect(el.state.context.question1).to.equal("yes");
-                }
-              }
-            },
-            blank: {
-              meta: {
-                test: async ({ el, expect }) => {
-                  expect(el.state.context.question1).to.eql("");
-                }
-              }
-            }
-          }
-        }
+        q1: buildQuestionNode(questions.find(q => q.id === "1")),
+        q2: buildQuestionNode(questions.find(q => q.id === "2"))
       },
       meta: {
         test: async ({ el, expect }) => {
@@ -115,6 +181,35 @@ const dwightMachine = Machine({
   }
 });
 
+const questionEvents = questions.reduce((acc, questionDef) => {
+  const right = {
+    key: `Q${questionDef.id}_RIGHT`,
+    value: {
+      exec: questionDef.right.eventExec
+    }
+  };
+
+  const wrong = {
+    key: `Q${questionDef.id}_WRONG`,
+    value: {
+      exec: questionDef.wrong.eventExec
+    }
+  };
+
+  const blank = {
+    key: `Q${questionDef.id}_BLANK`,
+    value: {
+      exec: questionDef.blank.eventExec
+    }
+  };
+  return {
+    ...acc,
+    [right.key]: right.value,
+    [wrong.key]: wrong.value,
+    [blank.key]: blank.value
+  };
+}, {});
+
 const dwightModel = createModel(dwightMachine).withEvents({
   APPLY_NOW: {
     exec: async ({ el }) => {
@@ -125,19 +220,6 @@ const dwightModel = createModel(dwightMachine).withEvents({
     exec: async ({ el }) => {
       el.shadowRoot.querySelector("chameleon-button[applylater]").click();
     }
-  },
-  Q1_RIGHT: {
-    exec: async ({ el }) => {
-      el.shadowRoot.querySelector("chameleon-radio[value='yes']").click();
-    }
-  },
-  Q1_WRONG: {
-    exec: async ({ el }) => {
-      el.shadowRoot.querySelector("chameleon-radio[value='no']").click();
-    }
-  },
-  Q1_BLANK: {
-    exec: () => {}
   },
   SORRY: {
     exec: async ({ el }) => {
@@ -153,7 +235,8 @@ const dwightModel = createModel(dwightMachine).withEvents({
     exec: async ({ el }) => {
       el.shadowRoot.querySelector("chameleon-button[submit]").click();
     }
-  }
+  },
+  ...questionEvents
 });
 
 describe("DwightJobApplication", () => {

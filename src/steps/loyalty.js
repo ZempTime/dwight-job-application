@@ -16,6 +16,20 @@ export default (state, send) => {
       }
     });
   };
+
+  const handleChange = e => {
+    const name = e.target.getAttribute("name");
+    const value = e.target.value;
+
+    send({
+      type: "input",
+      payload: {
+        name,
+        value
+      }
+    });
+  };
+
   return html`
     <div>
       <fieldset>
@@ -48,8 +62,8 @@ export default (state, send) => {
           label="Your Answer"
           id="question2"
           name="question2"
-          value="${question2}"
-          @change="${handleInput}"
+          .value="${question2}"
+          @change="${handleChange}"
         ></textarea>
       </fieldset>
     </div>
