@@ -1,6 +1,6 @@
 import { html, fixture, expect } from "@open-wc/testing";
-import { Machine } from "xstate/dist/xstate.web";
-import { createModel } from "@xstate/test";
+import { Machine } from "xstate/es";
+import { createModel } from "../src/xstate-test/es"
 
 import "../dwight-job-application.js";
 
