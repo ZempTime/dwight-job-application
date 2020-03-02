@@ -1,6 +1,6 @@
 import { html, fixture, expect } from "@open-wc/testing";
 import { Machine } from "xstate/es";
-import { createModel } from "../src/xstate-test/es"
+import { createModel } from "../src/xstate-test/es";
 
 import "../dwight-job-application.js";
 
@@ -10,7 +10,8 @@ const dwightMachine = Machine({
   states: {
     intro: {
       on: {
-        APPLY_NOW: "loyalty"
+        APPLY_NOW: "loyalty",
+        APPLY_LATER: "weakness"
       },
       meta: {
         test: async ({ el, expect }) => {
@@ -18,9 +19,55 @@ const dwightMachine = Machine({
         }
       }
     },
+    weakness: {
+      on: {
+        SORRY: "intro"
+      },
+      meta: {
+        test: async ({ el, expect }) => {
+          expect(el.state.context.currentStep).to.equal("weakness");
+        }
+      }
+    },
     loyalty: {
       on: {
-        NEXT: "surviability"
+        NEXT: "survivability"
+      },
+      type: "parallel",
+      states: {
+        q1: {
+          initial: "unanswered",
+          states: {
+            unanswered: {
+              on: {
+                Q1_WRONG: "wrong",
+                Q1_RIGHT: "right",
+                Q1_BLANK: "blank"
+              }
+            },
+            wrong: {
+              meta: {
+                test: async ({ el, expect }) => {
+                  expect(el.state.context.question1).to.equal("no");
+                }
+              }
+            },
+            right: {
+              meta: {
+                test: async ({ el, expect }) => {
+                  expect(el.state.context.question1).to.equal("yes");
+                }
+              }
+            },
+            blank: {
+              meta: {
+                test: async ({ el, expect }) => {
+                  expect(el.state.context.question1).to.eql("");
+                }
+              }
+            }
+          }
+        }
       },
       meta: {
         test: async ({ el, expect }) => {
@@ -70,17 +117,40 @@ const dwightMachine = Machine({
 
 const dwightModel = createModel(dwightMachine).withEvents({
   APPLY_NOW: {
-    exec: async el => {
+    exec: async ({ el }) => {
       el.shadowRoot.querySelector("chameleon-button[applynow]").click();
     }
   },
+  APPLY_LATER: {
+    exec: async ({ el }) => {
+      el.shadowRoot.querySelector("chameleon-button[applylater]").click();
+    }
+  },
+  Q1_RIGHT: {
+    exec: async ({ el }) => {
+      el.shadowRoot.querySelector("chameleon-radio[value='yes']").click();
+    }
+  },
+  Q1_WRONG: {
+    exec: async ({ el }) => {
+      el.shadowRoot.querySelector("chameleon-radio[value='no']").click();
+    }
+  },
+  Q1_BLANK: {
+    exec: () => {}
+  },
+  SORRY: {
+    exec: async ({ el }) => {
+      el.shadowRoot.querySelector("chameleon-button[sorry]").click();
+    }
+  },
   NEXT: {
-    exec: async el => {
+    exec: async ({ el }) => {
       el.shadowRoot.querySelector("chameleon-button[next]").click();
     }
   },
   SUBMIT: {
-    exec: async el => {
+    exec: async ({ el }) => {
       el.shadowRoot.querySelector("chameleon-button[submit]").click();
     }
   }

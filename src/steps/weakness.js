@@ -21,7 +21,9 @@ export default (state, send) => {
   return html`
     <div>
       <p>Wrong. I need decisiveness. I need commitment.</p>
-      <chameleon-button @click="${handleApology}"> I'm Sorry</chameleon-button>
+      <chameleon-button sorry @click="${handleApology}">
+        I'm Sorry</chameleon-button
+      >
     </div>
   `;
 };
