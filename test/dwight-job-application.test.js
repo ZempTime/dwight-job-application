@@ -2,6 +2,8 @@ import { html, fixture, expect, aTimeout } from "@open-wc/testing";
 import { Machine, assign } from "xstate/es";
 import { createModel } from "../src/xstate-test/es";
 
+const DELAY_MS = 50;
+
 import "../dwight-job-application.js";
 
 const questions = [
@@ -13,6 +15,7 @@ const questions = [
       },
       eventExec: async ({ el }) => {
         el.shadowRoot.querySelector("chameleon-radio[value='yes']").click();
+        await aTimeout(DELAY_MS);
       },
       actions: ["logRight"],
     },
@@ -22,6 +25,7 @@ const questions = [
       },
       eventExec: async ({ el }) => {
         el.shadowRoot.querySelector("chameleon-radio[value='no']").click();
+        await aTimeout(DELAY_MS);
       },
       actions: ["logWrong"],
     },
@@ -47,6 +51,7 @@ const questions = [
         inputTextarea.dispatchEvent(
           new CustomEvent("change", { target: inputTextarea })
         );
+        await aTimeout(DELAY_MS);
       },
       actions: ["logRight"],
     },
@@ -64,6 +69,7 @@ const questions = [
         inputTextarea.dispatchEvent(
           new CustomEvent("change", { target: inputTextarea })
         );
+        await aTimeout(DELAY_MS);
       },
       actions: ["logWrong"],
     },
@@ -83,6 +89,7 @@ const questions = [
       },
       eventExec: async ({ el }) => {
         el.shadowRoot.querySelector("chameleon-radio[value='bears']").click();
+        await aTimeout(DELAY_MS);
       },
       actions: ["logRight"],
     },
@@ -92,12 +99,14 @@ const questions = [
       },
       eventExec: async ({ el }) => {
         el.shadowRoot.querySelector("chameleon-radio[value='humans']").click();
+        await aTimeout(DELAY_MS);
       },
       actions: ["logWrong"],
     },
     blank: {
       test: async ({ el, expect }) => {
         expect(el.state.context.question3).to.equal("");
+        await aTimeout(DELAY_MS);
       },
       eventExec: () => {},
       actions: ["logWrong"],
@@ -114,6 +123,7 @@ const questions = [
         el.shadowRoot
           .querySelector("[name='question4']")
           .dispatchEvent(new Event("input"));
+        await aTimeout(DELAY_MS);
       },
       actions: ["logRight"],
     },
@@ -126,6 +136,7 @@ const questions = [
         el.shadowRoot
           .querySelector("[name='question4']")
           .dispatchEvent(new Event("input"));
+        await aTimeout(DELAY_MS);
       },
       actions: ["logWrong"],
     },
@@ -154,6 +165,7 @@ const questions = [
         await aTimeout(1);
         el.shadowRoot.querySelector("a[value='turkeys']").click();
         await aTimeout(1);
+        await aTimeout(DELAY_MS);
       },
       actions: ["logRight"],
     },
@@ -172,6 +184,7 @@ const questions = [
         await aTimeout(1);
         el.shadowRoot.querySelector("a[value='turkeys']").click();
         await aTimeout(1);
+        await aTimeout(DELAY_MS);
       },
       actions: ["logWrong"],
     },
@@ -191,6 +204,7 @@ const questions = [
       },
       eventExec: async ({ el }) => {
         el.shadowRoot.querySelector("chameleon-radio[value='mouth']").click();
+        await aTimeout(DELAY_MS);
       },
       actions: ["logRight"],
     },
@@ -200,6 +214,7 @@ const questions = [
       },
       eventExec: async ({ el }) => {
         el.shadowRoot.querySelector("chameleon-radio[value='back']").click();
+        await aTimeout(DELAY_MS);
       },
       actions: ["logWrong"],
     },
@@ -219,6 +234,7 @@ const questions = [
       },
       eventExec: async ({ el }) => {
         el.shadowRoot.querySelector("chameleon-radio[value='no']").click();
+        await aTimeout(DELAY_MS);
       },
       actions: ["logRight"],
     },
@@ -234,6 +250,7 @@ const questions = [
         inputTextarea.dispatchEvent(
           new CustomEvent("change", { target: inputTextarea })
         );
+        await aTimeout(DELAY_MS);
       },
       actions: ["logWrong"],
     },
@@ -266,6 +283,7 @@ const questions = [
         inputTextarea.dispatchEvent(
           new CustomEvent("change", { target: inputTextarea })
         );
+        await aTimeout(DELAY_MS);
       },
     },
     blank: {
@@ -407,6 +425,9 @@ const dwightMachine = Machine(
                 { target: "failed" },
               ],
             },
+            meta: {
+              description: "results",
+            },
           },
           passed: {
             type: "final",
@@ -416,6 +437,7 @@ const dwightMachine = Machine(
                   el.shadowRoot.querySelector("h2[result]").textContent
                 ).to.equal("You're hired.");
               },
+              description: "passed",
             },
           },
           failed: {
@@ -426,6 +448,7 @@ const dwightMachine = Machine(
                   el.shadowRoot.querySelector("h2[result]").textContent
                 ).to.equal("REJECTED");
               },
+              description: "failed",
             },
           },
         },
@@ -491,43 +514,79 @@ const dwightModel = createModel(dwightMachine).withEvents({
   APPLY_NOW: {
     exec: async ({ el }) => {
       el.shadowRoot.querySelector("chameleon-button[applynow]").click();
+      await aTimeout(DELAY_MS);
     },
   },
   APPLY_LATER: {
     exec: async ({ el }) => {
       el.shadowRoot.querySelector("chameleon-button[applylater]").click();
+      await aTimeout(DELAY_MS);
     },
   },
   SORRY: {
     exec: async ({ el }) => {
       el.shadowRoot.querySelector("chameleon-button[sorry]").click();
+      await aTimeout(DELAY_MS);
     },
   },
   NEXT: {
     exec: async ({ el }) => {
       el.shadowRoot.querySelector("chameleon-button[next]").click();
+      await aTimeout(DELAY_MS);
     },
   },
   SUBMIT: {
     exec: async ({ el }) => {
       el.shadowRoot.querySelector("chameleon-button[submit]").click();
+      await aTimeout(DELAY_MS);
     },
   },
   ...questionEvents,
 });
 
 describe("DwightJobApplication", () => {
-  const testPlans1 = dwightModel.getShortestPathPlans({
-    filter: (state) =>
-      !(state.matches("results.passed") || state.matches("results.failed")),
-  });
+  const css = `
+  dwight-job-application[topright] {
+    background: rgba(255, 255, 255, 1);
+    position:absolute;
+    width: 850px;
+    z-index: 300;
+    right:0;
+    top:40px;
+    opacity: 1;
+  }`;
+  const head = document.head;
+  let style = document.createElement("style");
+  head.appendChild(style);
+  style.type = "text/css";
+  style.appendChild(document.createTextNode(css));
+
+  let waysToPass = 0;
+  let waysToFail = 0;
+  const isCompleted = (meta) => {
+    if (meta.includes("dwight.results.passed")) {
+      waysToPass += 1;
+      return true;
+    }
+    if (meta.includes("dwight.results.failed")) {
+      waysToFail += 2;
+      return true;
+    }
+    return false;
+  };
+
+  const testPlans1 = dwightModel
+    .getShortestPathPlans()
+    .filter((p) => isCompleted(Object.keys(p.state.meta)));
+
+  console.log("waysToPass: ", waysToPass, "waysToFail:", waysToFail);
 
   testPlans1.forEach((plan) => {
     describe(plan.description, () => {
       plan.paths.forEach((path) => {
         it(path.description, async () => {
           const el = await fixture(html`
-            <dwight-job-application></dwight-job-application>
+            <dwight-job-application topright></dwight-job-application>
           `);
           await path.test({ el, expect });
         });
