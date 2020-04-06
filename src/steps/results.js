@@ -1,12 +1,12 @@
 import { html } from "lit-element";
 import "@chameleon-ds/card";
 
-export default state => {
+export default (state) => {
   const { hired, feedback } = state.context;
 
   if (hired) {
     return html`
-      <h2>You're hired.</h2>
+      <h2 result>You're hired.</h2>
       <p>Congratulations, you're not an idiot. See you on monday.</p>
     `;
   }
@@ -14,7 +14,7 @@ export default state => {
   if (!hired) {
     return html`
       <div>
-        <h2>REJECTED</h2>
+        <h2 result>REJECTED</h2>
         <p>
           I'm sorry, but you're an idiot. Only an idiot would hire an idiot. If
           an idiot would do a thing, I do not do that thing. So I'm not hiring
@@ -22,7 +22,7 @@ export default state => {
         </p>
         <h3>NEXT!</h3>
 
-        ${feedback.map(fb => {
+        ${feedback.map((fb) => {
           const { question, rightAnswer, yourAnswer, explanation } = fb;
           return html`
             <chameleon-card outline rounded>

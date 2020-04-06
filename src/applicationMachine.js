@@ -7,13 +7,13 @@ const setStepActions = [
   "survivability",
   "skills",
   "information",
-  "results"
+  "results",
 ].reduce((acc, step) => {
   const capitalizedStepName = step.charAt(0).toUpperCase() + step.slice(1);
-  acc[`setCurrentStep${capitalizedStepName}`] = assign(ctx => {
+  acc[`setCurrentStep${capitalizedStepName}`] = assign((ctx) => {
     return {
       ...ctx,
-      currentStep: step
+      currentStep: step,
     };
   });
   return acc;
@@ -35,66 +35,66 @@ const applicationMachine = Machine(
       question8: "",
       question9: "",
       hired: false,
-      feedback: []
+      feedback: [],
     },
     initial: "intro",
     on: {
       input: {
-        actions: ["setInput"]
-      }
+        actions: ["setInput"],
+      },
     },
     states: {
       intro: {
         entry: ["setCurrentStepIntro"],
         on: {
           applynow: "loyalty",
-          applylater: "weakness"
-        }
+          applylater: "weakness",
+        },
       },
       weakness: {
         entry: ["setCurrentStepWeakness", "weaknessDemonstrated"],
         on: {
-          apologize: "intro"
-        }
+          apologize: "intro",
+        },
       },
       loyalty: {
         entry: ["setCurrentStepLoyalty"],
         on: {
-          next: "survivability"
-        }
+          next: "survivability",
+        },
       },
       survivability: {
         entry: ["setCurrentStepSurvivability"],
         on: {
           previous: "loyalty",
-          next: "skills"
-        }
+          next: "skills",
+        },
       },
       skills: {
         entry: ["setCurrentStepSkills"],
         on: {
           previous: "survivability",
-          next: "information"
-        }
+          next: "information",
+        },
       },
       information: {
         entry: ["setCurrentStepInformation"],
         on: {
           submit: "results",
-          previous: "skills"
-        }
+          previous: "skills",
+        },
       },
       results: {
-        entry: ["setCurrentStepResults", "verifyAnswers"]
-      }
-    }
+        entry: ["setCurrentStepResults", "verifyAnswers"],
+      },
+    },
   },
   {
     actions: {
-      weaknessDemonstrated: assign(ctx => {
+      weaknessDemonstrated: assign((ctx) => {
         return {
           ...ctx,
-          weaknessDemonstratedCount: (ctx.weaknessDemonstratedCount += 1)
+          weaknessDemonstratedCount: (ctx.weaknessDemonstratedCount += 1),
         };
       }),
       ...setStepActions,
@@ -102,10 +102,10 @@ const applicationMachine = Machine(
         const { name, value } = e.payload;
         return {
           ...ctx,
-          [name]: value
+          [name]: value,
         };
       }),
-      verifyAnswers: assign(ctx => {
+      verifyAnswers: assign((ctx) => {
         const {
           question1,
           question2,
@@ -114,7 +114,7 @@ const applicationMachine = Machine(
           question5,
           question6,
           question8,
-          question9
+          question9,
         } = ctx;
 
         const feedback = [];
@@ -125,19 +125,18 @@ const applicationMachine = Machine(
             rightAnswer: "Yes.",
             yourAnswer: question1,
             explanation:
-              "Look, I'm all about loyalty. In fact, I feel like part of what I'm being paid for here is my loyalty. But if there were somewhere else that valued loyalty more highly... I'm going wherever they value loyalty the most."
+              "Look, I'm all about loyalty. In fact, I feel like part of what I'm being paid for here is my loyalty. But if there were somewhere else that valued loyalty more highly... I'm going wherever they value loyalty the most.",
           });
         }
 
-        const usedMaster = /master/i;
-        const usedSensei = /sensei/i;
+        const usedRespect = /master|sensei/i;
 
-        if (!usedMaster.test(question2) || !usedSensei.test(question2)) {
+        if (!usedRespect.test(question2)) {
           feedback.push({
             question: "Tell me how you think our ideal relationship will be.",
             rightAnswer: "You need to show proper respect and discipline.",
             yourAnswer: "Wrong.",
-            explanation: "You didn't even use the word 'Master' or 'Sensei.'"
+            explanation: "You didn't even use the word 'Master' or 'Sensei.'",
           });
         }
 
@@ -148,7 +147,7 @@ const applicationMachine = Machine(
             rightAnswer: "Bears. Obviously.",
             yourAnswer: question3,
             explanation:
-              "I saw 'Wedding Crashers' accidentally. I bought a ticket for 'Grizzly Man' and went into the wrong theater. After an hour, I figured I was in the wrong theater but I kept waiting. Cause that's the thing about bear attacks... they come when you least expect it."
+              "I saw 'Wedding Crashers' accidentally. I bought a ticket for 'Grizzly Man' and went into the wrong theater. After an hour, I figured I was in the wrong theater but I kept waiting. Cause that's the thing about bear attacks... they come when you least expect it.",
           });
         }
 
@@ -159,7 +158,7 @@ const applicationMachine = Machine(
             rightAnswer: "50%",
             yourAnswer: `${question4}%`,
             explanation:
-              "That dolphin is just as likely to save as to finish off that swimmer. Dolphins get a lot of good publicity for the drowning swimmers they push back to shore, but what you don't hear about is the many people they push further out to sea. Dolphins aren't smart. They just like pushing things."
+              "That dolphin is just as likely to save as to finish off that swimmer. Dolphins get a lot of good publicity for the drowning swimmers they push back to shore, but what you don't hear about is the many people they push further out to sea. Dolphins aren't smart. They just like pushing things.",
           });
         }
 
@@ -173,7 +172,7 @@ const applicationMachine = Machine(
             rightAnswer: "1) Neck, 2) Nostalgia, 3) Turkeys.",
             yourAnswer: question5.map((v, i) => `${i + 1}) ${v}`).join(" "),
             explanation:
-              "People underestimate the power of nostalgia. Nostalgia is truly one of the greatest human weaknesses, second only to the neck. Turkeys are only dangerous during mating season, and while you're unarmed."
+              "People underestimate the power of nostalgia. Nostalgia is truly one of the greatest human weaknesses, second only to the neck. Turkeys are only dangerous during mating season, and while you're unarmed.",
           });
         }
 
@@ -184,7 +183,7 @@ const applicationMachine = Machine(
             rightAnswer: "Mouth.",
             yourAnswer: question6,
             explanation:
-              "I know how to sit on a fence. Hell, I can even sleep on a fence. The trick is to do it face down with the post in your mouth."
+              "I know how to sit on a fence. Hell, I can even sleep on a fence. The trick is to do it face down with the post in your mouth.",
           });
         }
 
@@ -194,7 +193,7 @@ const applicationMachine = Machine(
             rightAnswer: "No.",
             wrongAnswer: "Yours.",
             explanation:
-              "New years resolutions? I don't do that. I've achieved plenty, and there's no better than the best."
+              "New years resolutions? I don't do that. I've achieved plenty, and there's no better than the best.",
           });
         }
 
@@ -204,17 +203,17 @@ const applicationMachine = Machine(
             rightAnswer: "Nothing.",
             wrongAnswer: "Yours.",
             explanation:
-              "If I actually wanted information from you, I would've asked you something specific."
+              "If I actually wanted information from you, I would've asked you something specific.",
           });
         }
 
         return {
           ...ctx,
           feedback,
-          hired: !(feedback.length > 0)
+          hired: !(feedback.length > 0),
         };
-      })
-    }
+      }),
+    },
   }
 );
 

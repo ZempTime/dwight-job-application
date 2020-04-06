@@ -88,7 +88,7 @@ export default (state, send) => {
       </p>
       <input
         type="range"
-        min="1"
+        min="0"
         max="100"
         name="question4"
         .value="${question4}"

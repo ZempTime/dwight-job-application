@@ -5,7 +5,7 @@ export default (state, send) => {
 
   const handleInput = e => {
     const name = e.target.getAttribute("name");
-    const value = e.target.getAttribute("value");
+    const value = e.target.getAttribute("value") || e.target.value;
 
     send({
       type: "input",

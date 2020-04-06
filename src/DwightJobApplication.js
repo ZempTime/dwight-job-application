@@ -41,15 +41,14 @@ export class DwightJobApplication extends LitElement {
 
   static get properties() {
     return {
-      state: { type: Object }
+      state: { type: Object },
     };
   }
 
   constructor() {
     super();
     this.service = interpret(applicationMachine)
-      .onTransition(state => {
-        console.log("event:", state.event.type, "state:", state);
+      .onTransition((state) => {
         this.state = state;
       })
       .start();
@@ -106,23 +105,21 @@ export class DwightJobApplication extends LitElement {
       "survivability",
       "skills",
       "information",
-      "results"
+      "results",
     ];
-    const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1);
+    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
     if (steps.includes(currentStep)) {
       return html`
         <p>
-          ${steps.map(step => {
+          ${steps.map((step) => {
             return step === currentStep
               ? html`
                   <span class="stepper-item"
                     ><strong>${capitalize(step)}</strong></span
                   >
                 `
-              : html`
-                  <span class="stepper-item">${capitalize(step)}</span>
-                `;
+              : html` <span class="stepper-item">${capitalize(step)}</span> `;
           })}
         </p>
       `;
