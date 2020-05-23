@@ -1,5 +1,5 @@
 ## Running
-
+To actually see if Dwight would hire you:
 
 * `git clone git@github.com:ZempTime/dwight-job-application.git`
 * `cd dwight-job-application && yarn && yarn start`
@@ -7,6 +7,8 @@
 
 ## Viewing Tests
 There's some weirdness here because at the time I wrote it, XState wasn't exporting ES modules. This has since been [fixed upstream](https://github.com/davidkpiano/xstate/releases/tag/%40xstate%2Ftest%400.4.0).
+
+This will show you through the variety of test paths
 
 * hop into `node_modules/xstate/es/environment.js`
 * set `var IS_PRODUCTION = false;` instead of `var IS_PRODUCTION = process.env.NODE_ENV === 'production';`
